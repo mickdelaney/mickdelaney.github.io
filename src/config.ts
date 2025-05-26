@@ -1,7 +1,7 @@
 export const SITE = {
-  website: "https://mickdelaney.github.io/", // replace this with your deployed domain
+  website: "https://mickdelaney.com/", // replace this with your deployed domain
   author: "mick delaney",
-  profile: "https://mickdelaney.github.io/",
+  profile: "https://mickdelaney.com/",
   desc: "I'm a CTO based in London, UK. I love building products and teams that solve real problems. I write about software engineering, product management, and leadership.",
   title: "mick delaney",
   ogImage: "avatar.jpg",
