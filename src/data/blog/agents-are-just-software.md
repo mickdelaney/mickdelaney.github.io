@@ -17,11 +17,26 @@ We’re drowning in hype, but if you peel back the curtain every “AI agent” 
 Distributed systems 101.
 
 Your boss says to ship a chatbot to handle those simple customer service queries. 
-Its a single bot with list of static text documents, all good. No state, easy to scale. 
+It's a single bot with list of static text documents. All good, no state, easy to scale. 
 
-But then it needs to look up records in a database, then it needs translate for customers in a different language, then it needs to a query through to an api. 
+But then the requirement expands and we need to look up records in a database, translate for customers in a different language, query through to an api.
 
-So the concensus is clear, more chatbots or should I say Agents...
+The bot becomes a jack-of-all-trades with no clear structure. It juggles roles and context all at once, and you start to feel the strain in a few clear ways:
+
+- Flows become harder to debug and maintain
+- Prompts get longer and harder to manage
+- It’s unclear which part of the bot is responsible for what
+- Adding a new use case risks breaking what’s already working
+
+That single-agent model starts to fall apart.
+
+We need to extract out the responsibilities into multiple specialized agents. 
+
+Each agent is focused on a single task — planning, research, data fetching, user interaction etc
+
+Each service is easier to develop, debug, test etc. 
+
+The concensus is clear, more chatbots or should I say Agents, or should I say Services...
 
 
 ## Agents
