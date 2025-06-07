@@ -5,7 +5,6 @@ modDatetime: 2025-05-28T15:22:00Z
 title: Agents Are Still Just Software
 slug: agents-are-still-just-software
 featured: true
-draft: false
 tags:
   - agents, ai, design, distributed-systems
 description:
@@ -14,11 +13,11 @@ description:
 
 import Tldr from '../../components/Tldr.astro'
 
-## Why the Next Wave of AI Is Really a Distributed‑Systems Story
+## Why the Next Wave of AI Is Really a Distributed-Systems Story
 
 <Tldr summary={[
-  "When you strip away the hype, an AI agent is nothing more than an autonomous software process that receives a message, performs work, and produces another message. ",
-  "That is precisely the definition of a distributed‑systems component."
+  "When you strip away the hype, an AI agent is nothing more than an autonomous software process that receives a message, performs work, and produces another message. ",
+  "That is precisely the definition of a distributed-systems component."
 ]} />
 
 ## Prologue
@@ -160,7 +159,7 @@ They bolted agents onto the Dapr building blocks.
 Highlights:
 
 - **Tiny actors**: millions per node. Good luck doing that with heavyweight containers.
-- **Workflow API**: retries, timeouts, compensation—because an LLM will hallucinate an invoice at 3 a.m., guaranteed.
+- **Workflow API**: retries, timeouts, compensation—because an LLM will hallucinate an invoice at 3 a.m., guaranteed.
 - **Cloud-neutral**: runs on Kubernetes, your laptop, or a potato—doesn't care.
 - **A2A adapter**: speaks the new lingua franca out of the box.
 
@@ -170,7 +169,7 @@ It's basically Spring Boot for agents, minus the XML and the existential dread.
 
 1. **Agents = services.** Give them versioned interfaces, proper monitoring, and a budget.
 2. **Use proven patterns.** Idempotent receivers, circuit breakers, sagas—you already know this stuff.
-3. **Expect hallucinations.** Add validator agents or human review before an AI refunds $1 million by accident.
+3. **Expect hallucinations.** Add validator agents or human review before an AI refunds $1 million by accident.
 4. **Trace everything.** If you can't answer “Where did this request go?” you're already in trouble.
 5. **Standardise early.** Adopt A2A (or whatever wins) so you're not building Babel 2.0.
 
