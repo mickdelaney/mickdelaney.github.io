@@ -1,0 +1,25 @@
+---
+/* Props: title (string), summary (string | string[]) */
+const { title = "TL;DR", summary } = Astro.props;
+---
+
+<section class="bg-[var(--background)] border border-[var(--border)] rounded-2xl p-4 my-4 shadow-sm">
+  <div class="text-lg font-semibold mb-2 text-[var(--foreground)] flex items-center">
+    <svg
+      class="w-5 h-5 mr-2 text-[var(--accent)]"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M5 13l4 4L19 7" />
+    </svg>
+    {title}
+  </div>
+
+  <div class="text-sm text-[var(--foreground)]/80 space-y-2">
+    {Array.isArray(summary)
+      ? summary.map((point, i) => <p key={i}>• {point}</p>)
+      : <p>{summary}</p>}
+  </div>
+</section>
