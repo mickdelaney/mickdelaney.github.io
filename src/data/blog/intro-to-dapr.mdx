@@ -1,0 +1,183 @@
+---
+author: mick delaney
+pubDatetime: 2025-05-28T15:22:00Z
+modDatetime: 2025-05-28T15:22:00Z
+title: Intro To Dapr
+slug: intro-to-dapr
+featured: true
+draft: true
+tags:
+  - dapr, distributed-systems
+description:
+  Introduction To Dapr
+---
+
+import Tldr from '../../components/Tldr.astro'
+
+## Why the Next Wave of AI Is Really a Distributed‑Systems Story
+
+<Tldr summary={[
+  "When you strip away the hype, an AI agent is nothing more than an autonomous software process that receives a message, performs work, and produces another message. ",
+  "That is precisely the definition of a distributed‑systems component."
+]} />
+
+## Prologue
+
+Your boss says to ship a chatbot to handle those simple customer service queries. 
+
+It's a single bot with list of static text documents. All good, self contained, stateless, easy to scale. 
+
+But then pressure arrives to push the needle, requirements expand:
+
+- Query a customer database to personalise answers.
+- Translate replies for international users.
+- Invoke ticketing and payment APIs to execute real tasks.
+
+The bot becomes a jack-of-all-trades with no clear structure. 
+
+It juggles roles and context all at once, and you start to feel the strain in a few clear ways:
+
+- Flows become harder to debug and maintain
+- Prompts get longer and harder to manage
+- It's unclear which part of the bot is responsible for what
+- Adding a new use case risks breaking what's already working
+
+That single-agent model starts to fall apart.
+
+Hold on, maybe we need to rethink this.
+
+We need to extract out the responsibilities into multiple specialized agents. 
+
+Each agent is focused on a single task — planning, research, data fetching, user interaction etc
+
+Each agent is easier to develop, debug, test etc. 
+
+## Okay, Let's Define “Agent” Before the Committee Does
+
+IBM [says](https://www.ibm.com/think/topics/ai-agents) an agent is “a system that autonomously does tasks for a user or another system.”  
+
+You know what else fits that description?  A cron job.  But fine, we'll roll with it.
+
+An agent, in practice, is a **long-running service** that:
+
+1. Listens on some endpoint (HTTP, Kafka, can with a string).
+2. Parses a message (sometimes structured, sometimes interpretive dance).
+3. Does work—maybe calls an API, maybe ponders the meaning of life via GPT-4o.
+4. Emits another message.
+
+## Single Responsibility
+
+Ok, no need to reinvent the wheel here again, agents are just software components, and we have plenty of prior art to lean on.
+
+We break up the monolithic bot into smaller, focused agents. 
+
+Each agent has a single responsibility, a single reason to change, is pluggable, easier to maintain etc etc.
+
+We connect them all up and hey presto, problem solved
+
+## Lots of Bots, Lots of Problems
+
+So you get a **PlannerAgent**, **FlightAgent**, **HotelAgent**, **SnarkAgent** - all yakking at each other until they deadlock.  
+
+The objective is to allow Agents to invoke other Agents. 
+
+Ok makes sense, but anyone who has worked on distributed systems knows this is where the fun begins.
+
+What if Agent A calls/waits on Agent B, and Agent B calls/waits on Agent C, and Agent C calls/waits on Agent A?
+
+We have a circular dependency. Deadlock. 
+
+## Distributed Ball Of Agent Mud
+
+Now we have agents calling apis and agents calling agents calling agents etc etc. 
+
+But how do we coordinate all these agents ?
+
+When should they stop ? 
+
+If Agent A calls Agent B, and Agent B calls Agent C and Agent C calls Agent A... Whoops ? 
+
+<figure>
+  <img
+    src="/distributed-ball-of-agent-mud.png"
+    alt="Distributed Ball Of Agent Mud"
+  />
+    <figcaption class="text-center">
+    Distributed Ball Of Agent Mud
+  </figcaption>
+</figure>
+
+
+## The Distributed-Systems Smorgasbord
+
+The moment you have more than one agent, you have a distributed system with all the usual suspects:
+
+- **Latency** - “Why is OrderAgent waiting 900 ms for TranslateAgent?”
+- **Schema** - “Oops, BillingAgent shipped a new JSON field without telling anyone.”
+- **Partial-Failure** - “ClassifierAgent is 502ing; do we retry, compensate, or pray?”
+- **Observability** - “Trace-ID? Never heard of her.”
+
+Spoiler: AI magic dust does not exorcise these demons.  
+
+You still need idempotent receivers, dead-letter queues, and logs that someone actually reads.
+
+
+## Google's A2A: Now With 37% More Acronyms
+
+Enter **Agent-2-Agent (A2A)**, Google's attempt to make agents interoperate without resorting to smoke signals.  
+
+It's HTTP, JSON-RPC, Server-Sent Events, OAuth, mTLS—basically REST++ with a neck-beard.
+
+Why care?  Because standards beat snowflakes.  
+
+A **FlightAgent** written in Rust on GCP can talk to a **WeatherAgent** written in Haskell on someone's Raspberry Pi, and nobody has to write a thousand lines of glue code.  
+
+Think OpenAPI for agents—only less depressing.
+
+## Real Example: DataCamp's Support Flow (a.k.a. Herding Cats)
+
+1. **FrontDeskAgent** grabs a new ticket.
+2. **ClassifierAgent** squints at it and screams “Billing!”
+3. **BillingAgent** pokes Stripe, does math, and maybe applies a credit because who doesn't love free money?
+4. **ResolutionAgent** drafts a heartfelt apology and kicks it back to the user.
+
+It all runs on A2A.  Swap BillingAgent for a cheaper LLM model?  No problem.  Hot-plug it like a USB drive.  Try doing that with your hand-rolled protobuf slurry.
+
+
+## Dapr Agents: Production Plumbing So You Can Sleep at Night
+The Dapr folks looked at all the Python scripts masquerading as agent frameworks and said, “Hold my YAML.”  
+
+So they bolted agents onto the Dapr runtime—pub/sub, state stores, retries, secret management, workflows, the whole kitchen sink.
+
+Highlights:
+
+- **Tiny actors**: millions per node. Good luck doing that with heavyweight containers.
+- **Workflow API**: retries, timeouts, compensation—because an LLM will hallucinate an invoice at 3 a.m., guaranteed.
+- **Cloud-neutral**: runs on Kubernetes, your laptop, or a potato—doesn't care.
+- **A2A adapter**: speaks the new lingua franca out of the box.
+
+It's basically Spring Boot for agents, minus the XML and the existential dread.
+
+
+## Architectural Takeaways (Tattoo These Somewhere)
+
+1. **Agents = services.** Give them versioned interfaces, proper monitoring, and a budget.
+2. **Use proven patterns.** Idempotent receivers, circuit breakers, sagas—you already know this stuff.
+3. **Expect hallucinations.** Add validator agents or human review before an AI refunds $1 million by accident.
+4. **Trace everything.** If you can't answer “Where did this request go?” you're already in trouble.
+5. **Standardise early.** Adopt A2A (or whatever wins) so you're not building Babel 2.0.
+
+
+## Epilogue: Same Circus, New Clowns
+
+We've come full circle.  
+
+Agents are just the 2025 skin on the same distributed-systems skeleton.  
+
+If you ignore that, you'll end up with a colourful, sentient, very expensive **Ball of Agent Mud**.  
+
+But if you treat agents like micro-services—with contracts, retries, metrics, and yes, budget constraints—you'll be fine.
+
+And hey, maybe this time we'll keep the lessons longer than a decade.
+
+*Now go write some code.  But please, for the love of uptime, add a `trace-id`.*
