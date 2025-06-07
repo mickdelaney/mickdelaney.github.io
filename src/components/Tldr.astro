@@ -19,7 +19,7 @@ const { title = "TL;DR", summary } = Astro.props;
 
   <div class="text-sm text-[var(--foreground)]/80 space-y-2">
     {Array.isArray(summary)
-      ? summary.map((point, i) => <p key={i}>• {point}</p>)
+      ? summary.map((point) => <p>• {point}</p>)
       : <p>{summary}</p>}
   </div>
 </section>
